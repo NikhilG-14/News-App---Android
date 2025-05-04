@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">News App</string>
+    <string name="app_icon">News app icon</string>
+    <string name="news_list_desc">List of news articles</string>
+    <string name="no_news_available">No news articles available.\nPull down to refresh.</string>
+    <string name="error_loading_news">Could not load news.\nPlease try again.</string>
+    <string name="new_badge_text">NEW</string>
+    <string name="time_icon_desc">Time icon</string>
+    <string name="read_more">Read More</string>
+</resources>
