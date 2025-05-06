@@ -15,6 +15,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.text.SimpleDateFormat;
@@ -66,55 +75,81 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setVisibility(View.GONE);
         emptyStateTextView.setVisibility(View.GONE);
 
-        new Thread(() -> {
-            try {
-                Thread.sleep(1500); // Simulated delay
+        String url = "https://gnews.io/api/v4/top-headlines?country=us&token=d722574e8e75944372536ab665e1d936";
 
-                List<NewsArticle> fetchedNews = createMockNewsData();
 
-                runOnUiThread(() -> updateNewsDisplay(fetchedNews));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                showError("Failed to load news");
-            }
-        }).start();
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                response -> {
+                    List<NewsArticle> apiNews = new ArrayList<>();
+                    try {
+                        JSONArray articles = response.getJSONArray("articles");
+                        for (int i = 0; i < articles.length(); i++) {
+                            JSONObject article = articles.getJSONObject(i);
+
+                            String title = article.getString("title");
+                            String description = article.getString("description");
+                            String time = article.getString("publishedAt");
+                            String urlToNews = article.getString("url");
+
+                            apiNews.add(new NewsArticle(title, description, time, urlToNews));
+                        }
+                        updateNewsDisplay(apiNews);
+                    } catch (JSONException e) {
+                        showError("Parsing error");
+                    }
+                },
+                error -> showError("Failed to fetch news"));
+
+        queue.add(jsonObjectRequest);
     }
 
+
     private void refreshNews() {
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000); // Shorter delay for refresh
+        String url = "https://gnews.io/api/v4/top-headlines?country=us&token=d722574e8e75944372536ab665e1d936";
 
-                List<NewsArticle> refreshedNews = createMockNewsData();
-                // Add a "new" article at the top when refreshing
-                refreshedNews.add(0, createFreshNewsArticle());
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                response -> {
+                    List<NewsArticle> refreshedNews = new ArrayList<>();
+                    try {
+                        JSONArray articles = response.getJSONArray("articles");
+                        for (int i = 0; i < articles.length(); i++) {
+                            JSONObject article = articles.getJSONObject(i);
 
-                runOnUiThread(() -> {
-                    updateNewsDisplay(refreshedNews);
-                    swipeRefreshLayout.setRefreshing(false);
-                    Toast.makeText(MainActivity.this, "News updated!", Toast.LENGTH_SHORT).show();
-                });
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                runOnUiThread(() -> {
+                            String title = article.getString("title");
+                            String description = article.getString("description");
+                            String time = article.getString("publishedAt");
+                            String urlToNews = article.getString("url");
+
+                            refreshedNews.add(new NewsArticle(title, description, time, urlToNews));
+                        }
+
+                        // Inject a few new mock articles at top
+                        List<NewsArticle> newMockArticles = getRandomMockArticles(2); // Add 2 mock "new" articles
+                        refreshedNews.addAll(0, newMockArticles);
+
+
+
+                        updateNewsDisplay(refreshedNews);
+                        swipeRefreshLayout.setRefreshing(false);
+                        Toast.makeText(MainActivity.this, "News updated!", Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        swipeRefreshLayout.setRefreshing(false);
+                        showError("Parsing error");
+                    }
+                },
+                error -> {
                     swipeRefreshLayout.setRefreshing(false);
                     showError("Failed to refresh news");
                 });
-            }
-        }).start();
+
+        queue.add(jsonObjectRequest);
     }
 
-    private NewsArticle createFreshNewsArticle() {
-        // Create a "fresh" news article with current timestamp
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        String currentTime = sdf.format(new Date());
 
-        return new NewsArticle(
-                "Breaking: New Content Added",
-                "You've just refreshed the news feed and discovered this new article at " + currentTime,
-                "Just now",
-                "https://example.com/breaking-news");
-    }
+
+
 
     private void updateNewsDisplay(List<NewsArticle> fetchedNews) {
         progressBar.setVisibility(View.GONE);
@@ -183,6 +218,24 @@ public class MainActivity extends AppCompatActivity {
 
         return mockNews;
     }
+
+    private List<NewsArticle> getRandomMockArticles(int count) {
+        List<NewsArticle> allMock = createMockNewsData();
+        List<NewsArticle> randomPicks = new ArrayList<>();
+        java.util.Collections.shuffle(allMock);
+        for (int i = 0; i < Math.min(count, allMock.size()); i++) {
+            NewsArticle article = allMock.get(i);
+            // Add "Just now" tag to simulate freshness
+            randomPicks.add(new NewsArticle(
+                    article.getTitle(),
+                    article.getDescription(),
+                    "Just now",
+                    article.getUrl()
+            ));
+        }
+        return randomPicks;
+    }
+
 
     public static class NewsArticle {
         private final String title;
