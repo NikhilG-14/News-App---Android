@@ -4,11 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp"
     app:cardUseCompatPadding="true"
-    android:foreground="?android:attr/selectableItemBackground"
+    android:foreground="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true">
 
@@ -17,8 +17,8 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Title with "NEW" badge -->
-        <RelativeLayout
+        <!-- Title and "NEW" badge side by side -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/titleContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -28,38 +28,41 @@
 
             <TextView
                 android:id="@+id/textViewTitle"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:textSize="18sp"
+                android:textColor="#212121"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                android:maxLines="2"
-                android:ellipsize="end"/>
+                android:ellipsize="end"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/textViewNewBadge"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="8dp" />
 
             <TextView
                 android:id="@+id/textViewNewBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:background="@drawable/new_badge_background"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
                 android:text="@string/new_badge_text"
                 android:textColor="@android:color/white"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:visibility="gone"/>
-        </RelativeLayout>
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Divider -->
         <View
             android:id="@+id/divider"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:background="#E0E0E0"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
+            android:background="#DADADA"
             app:layout_constraintTop_toBottomOf="@id/titleContainer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -70,20 +73,20 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textColor="#606060"
-            android:textSize="14sp"
-            android:lineSpacingExtra="4dp"
+            android:textColor="#444"
+            android:textSize="15sp"
+            android:lineSpacingExtra="5dp"
             android:maxLines="4"
             android:ellipsize="end"
             app:layout_constraintTop_toBottomOf="@id/divider"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Bottom Info Row -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintTop_toBottomOf="@id/textViewDescription"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -105,7 +108,7 @@
                 android:id="@+id/textViewTimestamp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
+                android:layout_marginStart="6dp"
                 android:textColor="#757575"
                 android:textSize="12sp"
                 android:textStyle="italic"
@@ -122,11 +125,10 @@
                 android:textColor="#FF4081"
                 android:textSize="14sp"
                 android:drawableEnd="@drawable/ic_arrow_right"
-                android:drawablePadding="4dp"
+                android:drawablePadding="6dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
